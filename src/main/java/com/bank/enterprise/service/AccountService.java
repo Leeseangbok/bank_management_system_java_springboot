@@ -36,6 +36,7 @@ public class AccountService {
         // 2. Fetch Relationships
         Branch branch = branchRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("Branch not found. Please insert HQ into database."));
+
         AccountType type = accountTypeRepository.findById(request.getAccountType().getTypeId())
                 .orElseThrow(() -> new RuntimeException("Account type not found."));
 

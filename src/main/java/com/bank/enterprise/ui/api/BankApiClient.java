@@ -55,12 +55,14 @@ public class BankApiClient {
     }
 
     // Add this inside BankApiClient.java
-    public boolean openNewAccount(String accountType) throws Exception {
+    public boolean openNewAccount(Integer accountTypeId) throws Exception {
         if (jwtToken == null) throw new IllegalStateException("Not authenticated");
 
-        // Creates the JSON: {"accountType": "SAVINGS"}
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("accountType", accountType);
+        Map<String, Object> typeObject = new HashMap<>();
+        typeObject.put("typeId", accountTypeId);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("accountType", typeObject);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_BASE_URL + "/accounts"))
@@ -79,8 +81,10 @@ public class BankApiClient {
         if (jwtToken == null) throw new IllegalStateException("Not Authenticated");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("/accounts"))
-                .header("Authorization", "Bearer" + jwtToken).build();
+                .uri(URI.create(API_BASE_URL + "/accounts"))
+                .header("Authorization", "Bearer " + jwtToken)
+                .GET()
+                .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         return objectMapper.readTree(response.body());

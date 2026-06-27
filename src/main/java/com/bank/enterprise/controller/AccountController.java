@@ -1,17 +1,16 @@
 package com.bank.enterprise.controller;
 
+import com.bank.enterprise.dto.request.AccountRequestDto;
 import com.bank.enterprise.dto.response.AccountResponseDto;
-import com.bank.enterprise.entity.Account;
 import com.bank.enterprise.service.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
 public class AccountController {
@@ -22,5 +21,11 @@ public class AccountController {
     public ResponseEntity<List<AccountResponseDto>> getMyAccounts() {
         List<AccountResponseDto> accounts = accountService.getMyAccounts();
         return ResponseEntity.ok(accounts);
+    }
+
+    @PostMapping
+    public ResponseEntity<AccountResponseDto> openNewAccount(@RequestBody AccountRequestDto request) {
+        AccountResponseDto newAccount = accountService.createAccount(request);
+        return new ResponseEntity<>(newAccount, HttpStatus.CREATED);
     }
 }

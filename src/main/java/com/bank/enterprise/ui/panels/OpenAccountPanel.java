@@ -3,16 +3,31 @@ package com.bank.enterprise.ui.panels;
 import com.bank.enterprise.ui.BankDesktopApp;
 import com.bank.enterprise.ui.api.BankApiClient;
 import com.bank.enterprise.ui.components.UIStyles;
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 public class OpenAccountPanel extends JPanel {
 
-    private final BankDesktopApp parentApp;
+    public static class KeyValue {
+        @Getter
+        private final int id;
+        private final String name;
+
+        public KeyValue(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     public OpenAccountPanel(BankDesktopApp parentApp) {
-        this.parentApp = parentApp;
         setLayout(new GridBagLayout());
         setBackground(UIStyles.BACKGROUND_COLOR);
 
@@ -35,13 +50,18 @@ public class OpenAccountPanel extends JPanel {
         card.add(titleLabel, gbc);
 
         // Account Type Dropdown
-        JLabel typeLabel = new JLabel("Select Account Type:");
-        typeLabel.setFont(UIStyles.LABEL_FONT);
-        gbc.gridy = 1; gbc.gridwidth = 1;
-        card.add(typeLabel, gbc);
+        Map<Integer, String> types = Map.of(
+                1, "SAVING",
+                2, "CURRENT",
+                3, "FIXED DEPOSIT",
+                4, "BUSINESS",
+                5, "LOAN"
+        );
 
-        String[] types = {"SAVINGS", "CHECKING"};
-        JComboBox<String> typeDropdown = new JComboBox<>(types);
+        JComboBox<KeyValue> typeDropdown = new JComboBox<>();
+
+        types.forEach((id, name) -> typeDropdown.addItem(new KeyValue(id, name)));
+
         typeDropdown.setFont(UIStyles.NORMAL_FONT);
         typeDropdown.setBackground(Color.WHITE);
         gbc.gridx = 1;
@@ -50,7 +70,6 @@ public class OpenAccountPanel extends JPanel {
         // Submit Button
         JButton submitButton = new JButton("Open Account");
         submitButton.setBackground(new Color(34, 139, 34)); // Green
-        submitButton.setForeground(Color.WHITE);
         submitButton.setFont(UIStyles.LABEL_FONT);
         submitButton.setFocusPainted(false);
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
@@ -59,30 +78,42 @@ public class OpenAccountPanel extends JPanel {
         // Back Button
         JButton backButton = new JButton("Cancel");
         backButton.setBackground(Color.DARK_GRAY);
-        backButton.setForeground(Color.WHITE);
         backButton.setFont(UIStyles.LABEL_FONT);
         backButton.setFocusPainted(false);
         gbc.gridy = 3;
         card.add(backButton, gbc);
 
-        add(card); // Add the white card to the main Alice Blue background
+        add(card);
 
         // Button Actions
         backButton.addActionListener(e -> parentApp.navigateTo("DASHBOARD"));
 
         submitButton.addActionListener(e -> {
             try {
-                String selectedType = (String) typeDropdown.getSelectedItem();
-                boolean success = BankApiClient.getInstance().openNewAccount(selectedType);
+                KeyValue selected = (KeyValue) typeDropdown.getSelectedItem();
+
+                assert selected != null;
+                int accountTypeId = selected.getId();
+
+                boolean success = BankApiClient.getInstance().openNewAccount(accountTypeId);
 
                 if (success) {
-                    JOptionPane.showMessageDialog(this, "Account successfully opened!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    parentApp.navigateTo("DASHBOARD"); // Go back and auto-refresh
+                    JOptionPane.showMessageDialog(this,
+                            "Account successfully opened!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    parentApp.navigateTo("DASHBOARD");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Failed to open account. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to open account. Please try again.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Network error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Network error: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
     }
