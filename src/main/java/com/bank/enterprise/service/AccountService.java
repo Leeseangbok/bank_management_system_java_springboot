@@ -69,12 +69,19 @@ public class AccountService {
                 .build();
     }
 
+    @Transactional
     public List<AccountResponseDto> getMyAccounts() {
+
+        // 1. Get the username from the active JWT Token
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 2. Find their credentials and get their Customer ID
         Credential credential = credentialRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
         Integer customerId = credential.getCustomer().getCustomerId();
 
+        // 3. Fetch their linked accounts and convert them to the clean DTO
         return accountOwnerRepository.findByCustomer_CustomerId(customerId).stream()
                 .map(mapping -> {
                     Account account = mapping.getAccount();
@@ -84,7 +91,8 @@ public class AccountService {
                             .balance(account.getCurrentBalance())
                             .ownerName(mapping.getCustomer().getFirstName() + " " + mapping.getCustomer().getLastName())
                             .build();
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
     }
 
     private String generateUniqueAccountNumber() {
