@@ -2,7 +2,6 @@ package com.bank.enterprise.controller;
 
 import com.bank.enterprise.dto.request.DepositRequestDto;
 import com.bank.enterprise.dto.request.TransferRequestDto;
-import com.bank.enterprise.entity.TransactionType;
 import com.bank.enterprise.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
