@@ -28,6 +28,9 @@ public class Account {
     @Column(name = "account_number", nullable = false, unique = true, length = 25)
     private String accountNumber;
 
+    @Column(name = "pin_hash", nullable = false)
+    private String pinHash;
+
     @Column(name = "account_status", length = 20)
     private String accountStatus = "Active";
 

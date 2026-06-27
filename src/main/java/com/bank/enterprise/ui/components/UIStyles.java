@@ -1,121 +1,36 @@
 package com.bank.enterprise.ui.components;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class UIStyles {
 
-    // =========================
-    // Colors
-    // =========================
-    public static final Color PRIMARY_COLOR = new Color(0, 102, 204);
-    public static final Color PRIMARY_DARK = new Color(0, 76, 153);
+    // ── Design Tokens ────────────────────────────────────────────────────────
+    public static final Color BG          = new Color(0x0D1B2A);
+    public static final Color SURFACE     = new Color(0x122030);
+    public static final Color CARD_BG     = new Color(0x1A2D42);
+    public static final Color ACCENT_GOLD = new Color(0xC9A84C);
+    public static final Color ACCENT_BLUE = new Color(0x3D5A80);
+    public static final Color TEXT_PRIMARY = new Color(0xF7F9FC);
+    public static final Color TEXT_MUTED   = new Color(0x8DA9C4);
+    public static final Color POSITIVE     = new Color(0x2ECC71);
+    public static final Color DANGER       = new Color(0xE74C3C);
+    public static final Color DIVIDER      = new Color(0x1E3550);
+    public static final Color FIELD_BG     = new Color(0x0F2336);
+    public static final Color FIELD_BORDER = new Color(0x2A4560);
+    public static final Color PIN_WEAK     = new Color(0xE74C3C);
+    public static final Color PIN_FAIR     = new Color(0xF39C12);
+    public static final Color PIN_STRONG   = new Color(0x2ECC71);
 
-    public static final Color BACKGROUND_COLOR = new Color(240, 248, 255);
-    public static final Color CARD_BACKGROUND = Color.WHITE;
-
-    public static final Color TEXT_COLOR = new Color(50, 50, 50);
-    public static final Color TEXT_LIGHT = new Color(120, 120, 120);
-
-    public static final Color SUCCESS_COLOR = new Color(46, 125, 50);
-    public static final Color WARNING_COLOR = new Color(255, 143, 0);
-    public static final Color ERROR_COLOR = new Color(211, 47, 47);
-
-    public static final Color BORDER_COLOR = new Color(220, 220, 220);
-
-    // =========================
-    // Fonts
-    // =========================
-    public static final Font TITLE_FONT =
-            new Font("Segoe UI", Font.BOLD, 28);
-
-    public static final Font SUBTITLE_FONT =
-            new Font("Segoe UI", Font.BOLD, 18);
-
-    public static final Font LABEL_FONT =
-            new Font("Segoe UI", Font.BOLD, 14);
-
-    public static final Font NORMAL_FONT =
-            new Font("Segoe UI", Font.PLAIN, 14);
-
-    public static final Font BUTTON_FONT =
-            new Font("Segoe UI", Font.BOLD, 14);
-
-    public static final Font TABLE_HEADER_FONT =
-            new Font("Segoe UI", Font.BOLD, 14);
-
-    public static final Font TABLE_CONTENT_FONT =
-            new Font("Segoe UI", Font.PLAIN, 13);
-
-    // =========================
-    // Dimensions
-    // =========================
-    public static final Dimension TEXT_FIELD_SIZE =
-            new Dimension(250, 35);
-
-    public static final Dimension BUTTON_SIZE =
-            new Dimension(120, 40);
-
-    public static final Dimension LARGE_BUTTON_SIZE =
-            new Dimension(180, 45);
-
-    // =========================
-    // Padding & Borders
-    // =========================
-    public static final Border PANEL_PADDING =
-            new EmptyBorder(20, 20, 20, 20);
-
-    public static final Border CARD_BORDER =
-            BorderFactory.createCompoundBorder(
-                    new LineBorder(BORDER_COLOR, 1, true),
-                    new EmptyBorder(25, 25, 25, 25)
-            );
-
-    public static final Border FIELD_BORDER =
-            BorderFactory.createCompoundBorder(
-                    new LineBorder(BORDER_COLOR, 1, true),
-                    new EmptyBorder(5, 10, 5, 10)
-            );
-
-    // =========================
-    // Component Styling Methods
-    // =========================
-    public static void styleButton(JButton button) {
-        button.setFont(BUTTON_FONT);
-        button.setBackground(PRIMARY_COLOR);
-        button.setForeground(TEXT_COLOR);
-        button.setFocusPainted(false);
-        button.setPreferredSize(BUTTON_SIZE);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    }
-
-    public static void styleTextField(JTextField field) {
-        field.setFont(NORMAL_FONT);
-        field.setPreferredSize(TEXT_FIELD_SIZE);
-        field.setBorder(FIELD_BORDER);
-    }
-
-    public static void stylePasswordField(JPasswordField field) {
-        field.setFont(NORMAL_FONT);
-        field.setPreferredSize(TEXT_FIELD_SIZE);
-        field.setBorder(FIELD_BORDER);
-    }
-
-    public static void styleLabel(JLabel label) {
-        label.setFont(LABEL_FONT);
-        label.setForeground(TEXT_COLOR);
-    }
-
-    public static void styleTitle(JLabel label) {
-        label.setFont(TITLE_FONT);
-        label.setForeground(PRIMARY_COLOR);
-    }
-
-    public static void styleCard(JPanel panel) {
-        panel.setBackground(CARD_BACKGROUND);
-        panel.setBorder(CARD_BORDER);
-    }
+    public static final Font FONT_HEADLINE = new Font("Segoe UI", Font.BOLD,   22);
+    public static final Font FONT_SUBHEAD  = new Font("Segoe UI", Font.PLAIN,  13);
+    public static final Font FONT_LABEL    = new Font("Segoe UI", Font.BOLD,   11);
+    public static final Font FONT_MONO     = new Font("Consolas", Font.PLAIN,  15);
+    public static final Font FONT_BALANCE  = new Font("Segoe UI", Font.BOLD,   26);
+    public static final Font FONT_BTN      = new Font("Segoe UI", Font.BOLD,   12);
+    public static final Font FONT_BRAND    = new Font("Segoe UI", Font.BOLD,  10);
+    public static final Font FONT_INPUT    = new Font("Segoe UI", Font.PLAIN, 14);
+    public static final Font FONT_MONOGRAM = new Font("Segoe UI", Font.BOLD,  96);
+    public static final Font FONT_CARD_TTL = new Font("Segoe UI", Font.BOLD,  15);
+    public static final Font FONT_CARD_SUB = new Font("Segoe UI", Font.PLAIN, 12);
 }

@@ -55,14 +55,12 @@ public class BankApiClient {
     }
 
     // Add this inside BankApiClient.java
-    public boolean openNewAccount(Integer accountTypeId) throws Exception {
+    public boolean openNewAccount(Integer accountTypeId, String finalPin) throws Exception {
         if (jwtToken == null) throw new IllegalStateException("Not authenticated");
 
-        Map<String, Object> typeObject = new HashMap<>();
-        typeObject.put("typeId", accountTypeId);
-
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("accountType", typeObject);
+        requestBody.put("accountTypeId", accountTypeId);
+        requestBody.put("pin", finalPin);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_BASE_URL + "/accounts"))

@@ -6,6 +6,7 @@ import com.bank.enterprise.entity.*;
 import com.bank.enterprise.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,34 +19,44 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final AccountRepository accountRepository;
-    private final CredentialRepository credentialRepository;
-    private final BranchRepository branchRepository;
-    private final AccountTypeRepository accountTypeRepository;
+    private final AccountRepository      accountRepository;
+    private final CredentialRepository   credentialRepository;
+    private final BranchRepository       branchRepository;
+    private final AccountTypeRepository  accountTypeRepository;
     private final AccountOwnerRepository accountOwnerRepository;
+    private final PasswordEncoder        passwordEncoder;
 
     @Transactional
     public AccountResponseDto createAccount(AccountRequestDto request) {
 
-        // 1. Identify User
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        // 1. Identify the logged-in customer
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
         Credential credential = credentialRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new RuntimeException("Logged in user not found."));
+                .orElseThrow(() -> new RuntimeException("Logged-in user not found."));
+
         Customer owner = credential.getCustomer();
 
-        // 2. Fetch Relationships
+        // 2. Fetch required relationships
         Branch branch = branchRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Branch not found. Please insert HQ into database."));
+                .orElseThrow(() -> new RuntimeException(
+                        "Branch not found. Please seed HQ into the database."));
 
-        AccountType type = accountTypeRepository.findById(request.getAccountType().getTypeId())
-                .orElseThrow(() -> new RuntimeException("Account type not found."));
+        AccountType type = accountTypeRepository.findById(request.getAccountTypeId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Account type not found. ID=" + request.getAccountTypeId()));
 
-        // 3. Generate Account Number
-        String newAccountNumber = generateUniqueAccountNumber();
+        // 3. Hash the PIN
+        String pinHash = passwordEncoder.encode(request.getPin());
 
-        // 4. Save the Account
+        // 4. Generate a unique account number
+        String accountNumber = generateUniqueAccountNumber();
+
+        // 5. Persist the account
         Account newAccount = new Account();
-        newAccount.setAccountNumber(newAccountNumber);
+        newAccount.setAccountNumber(accountNumber);
+        newAccount.setPinHash(pinHash);
         newAccount.setAccountType(type);
         newAccount.setBranch(branch);
         newAccount.setCurrentBalance(BigDecimal.ZERO);
@@ -53,9 +64,10 @@ public class AccountService {
         newAccount.setOverdraftLimit(BigDecimal.ZERO);
         newAccount.setCurrency("USD");
         newAccount.setAccountStatus("ACTIVE");
+
         Account savedAccount = accountRepository.save(newAccount);
 
-        // 5. Link Account to Customer
+        // 6. Link the account to the customer as primary owner
         AccountOwner accountOwner = new AccountOwner();
         accountOwner.setAccount(savedAccount);
         accountOwner.setCustomer(owner);
@@ -70,19 +82,17 @@ public class AccountService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<AccountResponseDto> getMyAccounts() {
 
-        // 1. Get the username from the active JWT Token
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
 
-        // 2. Find their credentials and get their Customer ID
         Credential credential = credentialRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found."));
 
         Integer customerId = credential.getCustomer().getCustomerId();
 
-        // 3. Fetch their linked accounts and convert them to the clean DTO
         return accountOwnerRepository.findByCustomer_CustomerId(customerId).stream()
                 .map(mapping -> {
                     Account account = mapping.getAccount();
@@ -90,23 +100,22 @@ public class AccountService {
                             .accountNumber(account.getAccountNumber())
                             .accountType(account.getAccountType())
                             .balance(account.getCurrentBalance())
-                            .ownerName(mapping.getCustomer().getFirstName() + " " + mapping.getCustomer().getLastName())
+                            .ownerName(mapping.getCustomer().getFirstName()
+                                    + " " + mapping.getCustomer().getLastName())
                             .build();
                 })
                 .collect(Collectors.toList());
     }
 
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
     private String generateUniqueAccountNumber() {
         Random random = new Random();
         String accountNumber;
-        boolean isUnique = false;
         do {
-            long generatedNumber = (long) (random.nextDouble() * 9_000_000_000L) + 1_000_000_000L;
-            accountNumber = String.valueOf(generatedNumber);
-            if (accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
-                isUnique = true;
-            }
-        } while (!isUnique);
+            long n = (long) (random.nextDouble() * 9_000_000_000L) + 1_000_000_000L;
+            accountNumber = String.valueOf(n);
+        } while (accountRepository.findByAccountNumber(accountNumber).isPresent());
         return accountNumber;
     }
 }
